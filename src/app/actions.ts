@@ -59,6 +59,40 @@ export async function toggleRequest(requestId: string, eventSlug: string, divisi
   if (source) revalidatePath(`/event/${eventSlug}/divisi/${source.slug}/diajukan`);
 }
 
+export async function updateRequest(requestId: string, eventSlug: string, divisionSlug: string, _state: FormState, formData: FormData): Promise<FormState> {
+  const event = await db.query.events.findFirst({ where: and(eq(events.slug, eventSlug), eq(events.isActive, true)) });
+  const source = event ? await db.query.divisions.findFirst({ where: and(eq(divisions.eventId, event.id), eq(divisions.slug, divisionSlug)) }) : null;
+  const request = event && source ? await db.query.requests.findFirst({ where: and(eq(requests.id, requestId), eq(requests.eventId, event.id), eq(requests.fromDivisionId, source.id)) }) : null;
+  if (!event || !source || !request) return { message: "Permintaan tidak ditemukan atau event tidak aktif.", errors: {} };
+  if (request.isFulfilled) return { message: "Permintaan yang sudah terpenuhi tidak dapat diedit.", errors: {} };
+  const parsed = requestSchema.safeParse(Object.fromEntries(formData));
+  if (!parsed.success) return invalid(parsed.error, formData);
+  const destination = await db.query.divisions.findFirst({ where: and(eq(divisions.id, parsed.data.toDivisionId), eq(divisions.eventId, event.id)) });
+  if (!destination || destination.id === source.id) return { message: "Pilih divisi tujuan yang berbeda.", errors: { toDivisionId: ["Divisi tujuan tidak valid."] }, values: valuesFrom(formData) };
+  const previousDestination = request.toDivisionId === destination.id ? null : await db.query.divisions.findFirst({ where: eq(divisions.id, request.toDivisionId) });
+  await db.update(requests).set({ toDivisionId: destination.id, itemName: parsed.data.itemName, quantity: parsed.data.quantity, location: parsed.data.location || null, deadlineOffsetDays: parsed.data.deadlineOffsetDays, note: parsed.data.note || null, updatedAt: new Date() }).where(and(eq(requests.id, requestId), eq(requests.eventId, event.id), eq(requests.fromDivisionId, source.id), eq(requests.isFulfilled, false)));
+  revalidatePath(`/event/${eventSlug}/divisi/${divisionSlug}`);
+  revalidatePath(`/event/${eventSlug}/divisi/${divisionSlug}/diajukan`);
+  revalidatePath(`/event/${eventSlug}/divisi/${divisionSlug}/masuk`);
+  revalidatePath(`/event/${eventSlug}/divisi/${destination.slug}/masuk`);
+  if (previousDestination) revalidatePath(`/event/${eventSlug}/divisi/${previousDestination.slug}/masuk`);
+  redirect(`/event/${eventSlug}/divisi/${divisionSlug}/diajukan?updated=1`);
+}
+
+export async function deleteRequest(requestId: string, eventSlug: string, divisionSlug: string) {
+  const event = await db.query.events.findFirst({ where: and(eq(events.slug, eventSlug), eq(events.isActive, true)) });
+  const source = event ? await db.query.divisions.findFirst({ where: and(eq(divisions.eventId, event.id), eq(divisions.slug, divisionSlug)) }) : null;
+  const request = event && source ? await db.query.requests.findFirst({ where: and(eq(requests.id, requestId), eq(requests.eventId, event.id), eq(requests.fromDivisionId, source.id)) }) : null;
+  if (!event || !source || !request) throw new Error("Permintaan tidak ditemukan atau event tidak aktif.");
+  if (request.isFulfilled) throw new Error("Permintaan yang sudah terpenuhi tidak dapat dihapus.");
+  const destination = await db.query.divisions.findFirst({ where: eq(divisions.id, request.toDivisionId) });
+  await db.delete(requests).where(and(eq(requests.id, requestId), eq(requests.eventId, event.id), eq(requests.fromDivisionId, source.id), eq(requests.isFulfilled, false)));
+  revalidatePath(`/event/${eventSlug}/divisi/${divisionSlug}`);
+  revalidatePath(`/event/${eventSlug}/divisi/${divisionSlug}/diajukan`);
+  if (destination) revalidatePath(`/event/${eventSlug}/divisi/${destination.slug}/masuk`);
+  redirect(`/event/${eventSlug}/divisi/${divisionSlug}/diajukan?deleted=1`);
+}
+
 export async function createEvent(_state: FormState, formData: FormData): Promise<FormState> {
   await assertAdmin();
   const parsed = eventSchema.safeParse(Object.fromEntries(formData));

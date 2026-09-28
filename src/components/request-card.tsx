@@ -1,9 +1,11 @@
-import { MapPin, MessageSquare, PackageCheck } from "lucide-react";
-import { toggleRequest } from "@/app/actions";
+import Link from "next/link";
+import { MapPin, MessageSquare, PackageCheck, Pencil } from "lucide-react";
+import { deleteRequest, toggleRequest } from "@/app/actions";
 import { deadlineLabel } from "@/lib/dates";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { StatusBadge } from "@/components/status-badge";
 import { Card } from "@/components/ui/card";
+import { RequestDeleteButton } from "@/components/request-delete-button";
 
 export function RequestCard({ request, eventDate, mode, eventSlug, divisionSlug, otherName, readOnly = false }: {
   request: { id: string; itemName: string; quantity: number; location: string | null; deadlineOffsetDays: number | null; note: string | null; isFulfilled: boolean; createdAt?: Date };
@@ -23,5 +25,6 @@ export function RequestCard({ request, eventDate, mode, eventSlug, divisionSlug,
     </div>
     {request.createdAt && <p className="mt-4 text-xs font-bold text-muted-foreground">Diajukan {request.createdAt.toLocaleString("id-ID", { timeZone: "Asia/Jakarta", dateStyle: "medium", timeStyle: "short" })}</p>}
     {mode === "incoming" && !readOnly && <form action={toggleRequest.bind(null, request.id, eventSlug, divisionSlug)}><Button variant={request.isFulfilled ? "outline" : "default"} className="mt-4 w-full sm:w-auto"><PackageCheck size={16} />{request.isFulfilled ? "Tandai belum terpenuhi" : "Tandai terpenuhi"}</Button></form>}
+    {mode === "outgoing" && divisionSlug && !readOnly && !request.isFulfilled && <div className="mt-4 flex flex-wrap gap-2"><Link href={`/event/${eventSlug}/divisi/${divisionSlug}/request/${request.id}/edit`} className={buttonVariants({ variant: "outline", size: "sm" })}><Pencil size={14} />Edit</Link><RequestDeleteButton action={deleteRequest.bind(null, request.id, eventSlug, divisionSlug)} /></div>}
   </Card>;
 }
