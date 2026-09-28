@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sarpras-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sarpras
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "127.0.0.1:55433:5432"
+    volumes:
+      - sarpras-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d sarpras"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  sarpras-postgres-data:

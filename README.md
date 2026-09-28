@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SARPRAS Event Request System
 
-## Getting Started
+Aplikasi pengajuan kebutuhan antar divisi untuk satu event aktif. Halaman divisi bersifat publik; pengelolaan event, divisi, dan seluruh request memerlukan login admin. Event yang diarsipkan tetap dapat dibaca tetapi tidak dapat diubah melalui alur publik.
 
-First, run the development server:
+## Menjalankan development
+
+1. Siapkan `.env.local` dari `.env.example`. Isi `AUTH_SECRET` dengan nilai acak yang panjang dan pilih `SEED_ADMIN_PASSWORD` khusus development. Jangan commit `.env.local`.
+2. Jalankan PostgreSQL lokal: `docker compose up -d postgres`. Container memakai `127.0.0.1:55433` dan volume persisten.
+3. Jalankan `pnpm install`, lalu `pnpm db:migrate`.
+4. Jalankan `pnpm db:seed` untuk membuat admin dan contoh event/divisi/request apabila `SEED_INCLUDE_DEMO=true`.
+5. Jalankan `pnpm dev`, lalu buka alamat yang ditampilkan Next.js.
+
+Seed dapat dijalankan ulang. Akun admin yang sudah ada tidak diubah kata sandinya kecuali `SEED_RESET_ADMIN_PASSWORD=true`. Seed menolak berjalan jika `NODE_ENV=production`; jangan arahkan kredensial development ke database produksi.
+
+## Alur
+
+- Publik: pilih event/divisi → ajukan request → pantau halaman Diajukan → divisi tujuan menandai status pada halaman Masuk.
+- Admin: login di `/admin/login` → kelola event dan divisi → aktifkan event → pantau request di `/admin/requests`.
+- Hanya satu event dapat aktif. Event lain dapat dilihat sebagai arsip.
+
+## Verifikasi
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Stack: Next.js 16 App Router, React 19, PostgreSQL 16, Drizzle ORM, Auth.js, Tailwind CSS 4, dan komponen [NeoBrutalism](https://neobrutalism.com/docs/installation) varian Base UI.
