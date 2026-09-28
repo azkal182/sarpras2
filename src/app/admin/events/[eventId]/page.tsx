@@ -25,7 +25,7 @@ export default async function EventAdminPage({ params, searchParams }: {
     <BackLink href="/admin/events">Semua event</BackLink>
     {(notice.updated || notice.divisionCreated || notice.divisionUpdated) && <p role="status" className="mt-5 border-2 border-black bg-mint p-3 font-bold">Perubahan berhasil disimpan.</p>}
     <div className="mt-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-      <div><p className="retro-kicker text-orange-700">{event.isActive ? "Event aktif" : "Event historis"}</p><h1 className="retro-title mt-2 text-5xl">{event.name}</h1><p className="mt-2 font-bold">{formatEventDate(event.eventDate)} · {event.slug}</p></div>
+      <div><p className="retro-kicker text-accent">{event.isActive ? "Event aktif" : "Event historis"}</p><h1 className="retro-title mt-2 text-5xl">{event.name}</h1><p className="mt-2 font-bold">{formatEventDate(event.eventDate)} · {event.slug}</p></div>
       <div className="flex flex-wrap gap-3">
         <Link href={`/admin/events/${event.id}/edit`} className={buttonVariants({ variant: "outline" })}>Edit event</Link>
         {!event.isActive && <ActivateEventDialog eventId={event.id} eventName={event.name} />}

@@ -42,7 +42,7 @@ export default async function AdminRequestsPage({ searchParams }: { searchParams
     return `/admin/requests?${query}`;
   };
   return <main className="mx-auto max-w-6xl px-4 py-8 sm:px-8">
-    <p className="retro-kicker text-orange-700">Pengawasan admin</p>
+    <p className="retro-kicker text-accent">Pengawasan admin</p>
     <h1 className="retro-title mt-3 text-5xl">Semua request.</h1>
     <p className="mt-4 font-bold">Pantau kebutuhan lintas event dan divisi dari satu tempat.</p>
     <Card className="mt-7 border-3 p-5 shadow-lg"><form method="get" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] lg:items-end">

@@ -18,7 +18,7 @@ export default async function NewRequestPage({ params }: { params: Promise<{ eve
     <div className="mx-auto max-w-2xl">
       <BackLink href={`/event/${eventSlug}/divisi/${divisionSlug}`}>Kembali ke {source.name}</BackLink>
       <DivisionNavigation eventSlug={eventSlug} divisionSlug={divisionSlug} divisionNames={allDivisions} />
-      <p className="retro-kicker mt-8 text-orange-700">Request baru</p>
+      <p className="retro-kicker mt-8 text-accent">Request baru</p>
       <h1 className="retro-title mt-3 text-5xl sm:text-7xl">Butuh apa?</h1>
       <p className="mt-4 max-w-xl font-bold">Isi singkat saja. Divisi tujuan akan melihat detail ini di inbox mereka.</p>
       <Card className="mt-8 border-3 p-5 shadow-lg sm:p-7"><RequestForm action={createRequest.bind(null, eventSlug, divisionSlug)} divisions={allDivisions.filter((target) => target.id !== source.id)} /></Card>

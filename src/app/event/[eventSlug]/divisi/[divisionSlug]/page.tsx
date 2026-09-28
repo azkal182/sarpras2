@@ -30,7 +30,7 @@ export default async function DivisionPage({ params }: { params: Promise<{ event
       </header>
       <DivisionNavigation eventSlug={eventSlug} divisionSlug={divisionSlug} divisionNames={allDivisions} active="home" />
       <section className="mt-7 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-        <div><p className="retro-kicker text-orange-700">Ruang kerja divisi</p><h1 className="retro-title mt-3 text-5xl sm:text-7xl">{division.name}</h1><p className="mt-4 flex items-center gap-2 font-bold"><CalendarDays size={17} />{event.name} · {formatEventDate(event.eventDate)}</p></div>
+        <div><p className="retro-kicker text-accent">Ruang kerja divisi</p><h1 className="retro-title mt-3 text-5xl sm:text-7xl">{division.name}</h1><p className="mt-4 flex items-center gap-2 font-bold"><CalendarDays size={17} />{event.name} · {formatEventDate(event.eventDate)}</p></div>
         {event.isActive && <Link href={`/event/${eventSlug}/divisi/${divisionSlug}/request/new`} className={buttonVariants({ size: "lg" })}><Plus size={18} />Ajukan kebutuhan</Link>}
       </section>
       <section aria-label="Ringkasan request belum terpenuhi" className="mt-9 grid gap-4 sm:grid-cols-2">
@@ -38,7 +38,7 @@ export default async function DivisionPage({ params }: { params: Promise<{ event
         <Link href={`/event/${eventSlug}/divisi/${divisionSlug}/diajukan`} className="block"><Card className="h-full border-3 bg-sky p-5 shadow-md"><p className="retro-kicker">Diajukan · belum terpenuhi</p><p className="mt-3 text-5xl font-black">{outgoing.total}</p><p className="mt-2 font-bold">Kebutuhan yang diajukan divisi ini</p></Card></Link>
       </section>
       <section className="mt-10">
-        <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="retro-kicker text-orange-700">Prioritas</p><h2 className="retro-title mt-2 text-3xl">Perlu perhatian</h2></div><Link href={`/event/${eventSlug}/divisi/${divisionSlug}/masuk`} className={buttonVariants({ variant: "outline" })}>Lihat semua</Link></div>
+        <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="retro-kicker text-accent">Prioritas</p><h2 className="retro-title mt-2 text-3xl">Perlu perhatian</h2></div><Link href={`/event/${eventSlug}/divisi/${divisionSlug}/masuk`} className={buttonVariants({ variant: "outline" })}>Lihat semua</Link></div>
         <div className="mt-4 grid gap-4">{attention.length ? attention.map((item) => <RequestCard key={item.id} request={item} eventDate={event.eventDate} mode="incoming" eventSlug={eventSlug} divisionSlug={divisionSlug} otherName={names.get(item.fromDivisionId) || "Divisi lain"} readOnly={!event.isActive} />) : <Card className="border-3 p-5 font-bold shadow-md">Tidak ada permintaan yang menunggu.</Card>}</div>
       </section>
     </div>
