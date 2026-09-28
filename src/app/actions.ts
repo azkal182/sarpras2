@@ -100,6 +100,7 @@ export async function createEvent(_state: FormState, formData: FormData): Promis
   const slug = slugify(parsed.data.slug);
   if (await db.query.events.findFirst({ where: eq(events.slug, slug) })) return { message: "Slug sudah digunakan.", errors: { slug: ["Pilih slug lain."] }, values: valuesFrom(formData) };
   await db.insert(events).values({ ...parsed.data, slug });
+  revalidatePath("/");
   revalidatePath("/admin/events");
   redirect("/admin/events?created=1");
 }
@@ -123,6 +124,9 @@ export async function updateEvent(eventId: string, _state: FormState, formData: 
 
 export async function activateEvent(eventId: string) {
   await assertAdmin();
+  const target = await db.query.events.findFirst({ where: eq(events.id, eventId) });
+  if (!target) throw new Error("Event tidak ditemukan.");
+  const previous = await db.query.events.findFirst({ where: eq(events.isActive, true) });
   await db.transaction(async (tx) => {
     const event = await tx.query.events.findFirst({ where: eq(events.id, eventId) });
     if (!event) throw new Error("Event tidak ditemukan.");
@@ -131,6 +135,8 @@ export async function activateEvent(eventId: string) {
   });
   revalidatePath("/");
   revalidatePath("/admin/events");
+  revalidatePath(`/event/${target.slug}`);
+  if (previous && previous.slug !== target.slug) revalidatePath(`/event/${previous.slug}`);
 }
 
 export async function createDivision(eventId: string, _state: FormState, formData: FormData): Promise<FormState> {
@@ -142,6 +148,7 @@ export async function createDivision(eventId: string, _state: FormState, formDat
   const slug = slugify(parsed.data.slug);
   if (await db.query.divisions.findFirst({ where: and(eq(divisions.eventId, eventId), eq(divisions.slug, slug)) })) return { message: "Slug sudah digunakan.", errors: { slug: ["Pilih slug lain."] }, values: valuesFrom(formData) };
   await db.insert(divisions).values({ eventId, ...parsed.data, slug });
+  revalidatePath("/");
   revalidatePath(`/admin/events/${eventId}`);
   revalidatePath(`/event/${event.slug}`);
   redirect(`/admin/events/${eventId}?divisionCreated=1`);
@@ -159,7 +166,9 @@ export async function updateDivision(eventId: string, divisionId: string, _state
   await db.update(divisions).set({ ...parsed.data, slug, updatedAt: new Date() }).where(eq(divisions.id, divisionId));
   const event = await db.query.events.findFirst({ where: eq(events.id, eventId) });
   if (event) {
+    revalidatePath("/");
     revalidatePath(`/event/${event.slug}`);
+    revalidatePath(`/event/${event.slug}/divisi/${slug}`);
     revalidatePath(`/event/${event.slug}/divisi/${division.slug}`);
   }
   revalidatePath(`/admin/events/${eventId}`);

@@ -8,6 +8,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const event = await db.query.events.findFirst({ where: eq(events.isActive, true) });
   const eventDivisions = event ? await db.select().from(divisions).where(eq(divisions.eventId, event.id)).orderBy(asc(divisions.name)) : [];

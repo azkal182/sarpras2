@@ -12,6 +12,19 @@ Aplikasi pengajuan kebutuhan antar divisi untuk satu event aktif. Halaman divisi
 
 Seed dapat dijalankan ulang. Akun admin yang sudah ada tidak diubah kata sandinya kecuali `SEED_RESET_ADMIN_PASSWORD=true`. Seed menolak berjalan jika `NODE_ENV=production`; jangan arahkan kredensial development ke database produksi.
 
+Untuk membuat akun admin production tanpa membuat data demo, gunakan command terpisah:
+
+```bash
+ADMIN_NAME="Administrator" \
+ADMIN_EMAIL="admin@domainanda.com" \
+ADMIN_PASSWORD="gunakan-password-minimal-12-karakter" \
+DATABASE_URL="postgresql://..." \
+DATABASE_SSL=require \
+pnpm db:create-admin
+```
+
+Command ini hanya membuat akun baru dan gagal jika email tersebut sudah terdaftar.
+
 ## Alur
 
 - Publik: pilih event/divisi → ajukan request → pantau halaman Diajukan → divisi tujuan menandai status pada halaman Masuk.

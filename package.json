@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:create-admin": "DOTENV_CONFIG_PATH=.env.local tsx src/db/create-admin.ts",
     "db:studio": "drizzle-kit studio",
     "db:seed": "DOTENV_CONFIG_PATH=.env.local tsx src/db/seed.ts",
     "test": "node --import tsx --test src/lib/*.test.ts"
